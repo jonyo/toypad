@@ -58,6 +58,13 @@ module.exports = (function () {
 			0x00, 0x00, 0x00, 0x00]);
 	};
 
+	device.prototype.disconnect = function () {
+		if (!this.hidDevice_) {
+			return;
+		}
+		this.hidDevice_.close();
+	};
+
 	device.prototype.checksum = function(data) {
 		var checksum = 0;
 		for (var i = 0; i < data.length; i++) {

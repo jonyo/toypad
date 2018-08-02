@@ -7,6 +7,8 @@ var toypad = new Device();
 toypad.connect();
 
 // sample to turn it red
-toypad.updatePanel(panel.CENTER, colors.RED, 0.5);
+toypad.updatePanel(panel.ALL, colors.RED, 0.5);
+
+toypad.disconnect();
 
 module.exports = toypad;
