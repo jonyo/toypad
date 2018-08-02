@@ -36,6 +36,16 @@ new (function() {
 			20
 		);
 
+		device.write([0x00,
+			0x55, 0x0f, 0xb0, 0x01,
+			0x28, 0x63, 0x29, 0x20,
+			0x4c, 0x45, 0x47, 0x4f,
+			0x20, 0x32, 0x30, 0x31,
+			0x34, 0xf7, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00]);
+
 		if (debug) {
 			setInterval(
 				function() {
@@ -59,6 +69,29 @@ new (function() {
 			clearInterval(poller);
 		}
 		poller = null;
+	}
+
+	var pad = function pad(data) {
+		while(data.length < 32) {
+			data.push(0x00);
+		}
+		return data;
+	}
+
+	var checksum = function checksum(data) {
+		var checksum = 0;
+		for (var i = 0; i < data.length; i++) {
+			checksum += data[i];
+		}
+		data.push(checksum & 0xFF);
+		return data;
+	};
+
+	function write(data) {
+		if (!device) {
+			return;
+		}
+		device.write([0x00].concat(pad(checksum(data))))
 	}
 
 	ext._shutdown = function() {
@@ -102,7 +135,7 @@ new (function() {
 		];
 
 		this.colourUpdateNumber_++;
-		device.write([0x55, 0x08, 0xc2].concat(data));
+		write([0x55, 0x08, 0xc2].concat(data));
 	}.bind(ext);
 
 	var descriptor = {
