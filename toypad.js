@@ -4,6 +4,7 @@ var Device = require('./device.js'),
 	colors = require('./colors.js');
 
 var toypad = new Device();
+toypad.connect();
 
 // sample to turn it red
 toypad.updatePanel(panel.CENTER, colors.RED, 0.5);
