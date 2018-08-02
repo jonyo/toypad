@@ -6,6 +6,6 @@ var Device = require('./device.js'),
 var toypad = new Device();
 
 // sample to turn it red
-// device.updatePanel(panel.CENTER, colors.RED, 0.5);
+toypad.updatePanel(panel.CENTER, colors.RED, 0.5);
 
 module.exports = toypad;
