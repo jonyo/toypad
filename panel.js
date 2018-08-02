@@ -24,4 +24,4 @@ module.exports = (function() {
 	add('RIGHT', 3);
 
 	return panel;
-});
+})();
