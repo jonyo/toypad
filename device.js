@@ -4,7 +4,9 @@ module.exports = (function () {
 		HID = require('node-hid'),
 		minifig = require('./minifig.js'),
 		action = require('./action.js'),
-		panel = require('./panel.js');
+		panel = require('./panel.js'),
+		PRODUCT_ID_ = 0x0241,
+		VENDOR_ID_ = 0x0e6f;
 
 	var device = function() {
 		EventEmitter.call(this);
