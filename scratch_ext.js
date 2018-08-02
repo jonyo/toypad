@@ -3,7 +3,7 @@ new (function() {
 	var input = null;
 	var poller = null;
 	var ext = this;
-	var debug = false;
+	var debug = true;
 	var speeds = {
 		SLOW: 1.0,
 		MEDIUM: 0.5,
@@ -118,12 +118,15 @@ new (function() {
 	}
 
 	ext.updatePanel = function(panel, color, speed) {
+		console.log('updatePanel');
 		if (!device) {
+			console.log('No device connected!');
 			return;
 		}
 		speed = speeds[speed];
 		color = colors[color];
 		panel = panels[panel];
+		console.log(speed, color, panel);
 		var data = [
 			this.colourUpdateNumber_ & 0xFF,
 			panel,
