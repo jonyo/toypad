@@ -2,9 +2,9 @@ module.exports = (function () {
 	var EventEmitter = require('events').EventEmitter,
 		util = require('util'),
 		HID = require('node-hid'),
-		minifig = require('./minifig.js'),
-		action = require('./action.js'),
-		panel = require('./panel.js'),
+		Minifig = new (require('./minifig.js'))(),
+		Action = new (require('./action.js'))(),
+		Panel = new (require('./panel.js'))(),
 		PRODUCT_ID_ = 0x0241,
 		VENDOR_ID_ = 0x0e6f;
 
@@ -23,18 +23,18 @@ module.exports = (function () {
 			var cmd = data[1];
 			if (cmd == 0x0b) {
 				// minifg scanned
-				var panel = panel.byCode(data[2]);
-				var action = action.byCode(data[5]);
-				var signature = getHexSignature_(data.slice(7, 13));
+				var panel = Panel.byCode(data[2]);
+				var action = Action.byCode(data[5]);
+				var signature = getHexSignature(data.slice(7, 13));
 				this.emit('minifig-scan', {
 					'panel': panel,
 					'action': action,
-					'minifig': minifig.byId(signature),
+					'minifig': Minifig.byId(signature),
 					'id': signature
 				});
 			} else if (cmd == 0x01) {
 				// LED change
-
+				console.log('led-change', data);
 			} else if (cmd == 0x19) {
 				// connected
 				this.emit('connected');
@@ -65,7 +65,18 @@ module.exports = (function () {
 		this.hidDevice_.close();
 	};
 
-	device.prototype.checksum = function(data) {
+	var getHexSignature = function (buffer) {
+		var signature = '';
+		for (var i = 0; i < buffer.length; i++) {
+		signature +=
+			((buffer[i] >> 4) & 0xF).toString(16) +
+			(buffer[i] & 0xF).toString(16) +
+			' ';
+		}
+		return signature.trim();
+	};
+
+	var checksum = function(data) {
 		var checksum = 0;
 		for (var i = 0; i < data.length; i++) {
 			checksum += data[i];
@@ -74,7 +85,7 @@ module.exports = (function () {
 		return data;
 	};
 
-	device.prototype.pad = function(data) {
+	var pad = function(data) {
 		while(data.length < 32) {
 			data.push(0x00);
 		}
@@ -82,7 +93,7 @@ module.exports = (function () {
 	};
 
 	device.prototype.write = function(data) {
-		this.hidDevice_.write([0x00].concat(this.pad(this.checksum(data))));
+		this.hidDevice_.write([0x00].concat(pad(checksum(data))));
 	};
 
 	device.prototype.updatePanel = function(panel, color, opt_speed) {

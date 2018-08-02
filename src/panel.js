@@ -1,8 +1,10 @@
 module.exports = (function() {
-	var panelsByCode = {};
+	var panelsByCode = {},
+		color = require('./color.js');
+
 	var panel = function (){};
 
-	panel.prototype.byCode = function(code) {
+	panel.prototype.byCode = function (code) {
 		return panelsByCode[code] || null;
 	};
 
@@ -10,12 +12,14 @@ module.exports = (function() {
 		if (name === 'byCode') {
 			return;
 		}
-		var section = {
+		var info = {
 			code: code,
-			name: name
+			name: name,
+			minifigs: {},
+			color: color.OFF
 		};
-		panel[name] = section;
-		panelsByCode[code] = section;
+		panel[name] = info;
+		panelsByCode[code] = info;
 	};
 
 	add('ALL', 0);
