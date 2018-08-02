@@ -16,7 +16,7 @@ module.exports = (function () {
 			id: id,
 			name: name
 		};
-		minifig.prototype[name] = figure;
+		minifig[name] = figure;
 		minifigById[id] = figure;
 	};
 

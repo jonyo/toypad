@@ -14,7 +14,7 @@ module.exports = (function() {
 			code: code,
 			name: name
 		};
-		action.prototype[name] = act;
+		action[name] = act;
 		actionsByCode[code] = act;
 	};
 

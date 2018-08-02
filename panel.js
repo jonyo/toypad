@@ -14,7 +14,7 @@ module.exports = (function() {
 			code: code,
 			name: name
 		};
-		panel.prototype[name] = section;
+		panel[name] = section;
 		panelsByCode[code] = section;
 	};
 
