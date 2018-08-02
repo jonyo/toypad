@@ -82,7 +82,7 @@ module.exports = (function () {
 		}
 		var data = [
 		this.colourUpdateNumber_ & 0xFF,
-		PANEL_TO_CODE_[panel],
+		panel.code,
 		((1 - opt_speed) * 0xFF) & 0xFF,
 		0x01, (color >> 16) & 0xFF,
 		(color >> 8) & 0xFF,
