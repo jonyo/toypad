@@ -15,6 +15,8 @@
 
 	// Fill in the starting values for the hat
 	for (var i = 0; i < panels.length; i++) {
+		minifigsAdded[panels[i]] = {};
+		minifigsRemoved[panels[i]] = {};
 		for (var m = 0; m < minifigs.length; m++) {
 			minifigsAdded[panels[i]][minifigs[m]] = false;
 			minifigsRemoved[panels[i]][minifigs[m]] = false;
