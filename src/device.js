@@ -4,7 +4,7 @@ module.exports = (function () {
 		HID = require('node-hid'),
 		Minifig = new (require('./minifig.js'))(),
 		Action = new (require('./action.js'))(),
-		Panel = new (require('./panel.js'))(),
+		Panel = require('./panel.js'),
 		PRODUCT_ID_ = 0x0241,
 		VENDOR_ID_ = 0x0e6f;
 
@@ -12,6 +12,11 @@ module.exports = (function () {
 		EventEmitter.call(this);
 		this.hidDevice_ = null;
 		this.colourUpdateNumber_ = 0;
+		// expose things on the device api
+		this.panels = Panel;
+		this.colors = require('./color.js');
+		this.minifigs = Minifig;
+		this.actions = Action;
 	};
 
 	util.inherits(device, EventEmitter);
@@ -23,7 +28,7 @@ module.exports = (function () {
 			var cmd = data[1];
 			if (cmd == 0x0b) {
 				// minifg scanned
-				var panel = Panel.byCode(data[2]);
+				var panel = Panel.codes[data[2]] || null;
 				var action = Action.byCode(data[5]);
 				var signature = getHexSignature(data.slice(7, 13));
 				this.emit('minifig-scan', {

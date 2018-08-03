@@ -1,31 +1,35 @@
-module.exports = (function() {
-	var panelsByCode = {},
-		color = require('./color.js');
+var codes = {},
+	names = {},
+	color = require('./color.js');
 
-	var panel = function (){};
+var panel = function (name, code){
+	this.code = code;
+	this.name = name;
+	this.minifigs = {};
+	this.color = color.OFF;
+};
 
-	panel.prototype.byCode = function (code) {
-		return panelsByCode[code] || null;
-	};
+panel.prototype.addMinifig = function(minifig) {
+	this.minifigs[minifig.name] = minifig;
+};
 
-	var add = function(name, code) {
-		if (name === 'byCode') {
-			return;
-		}
-		var info = {
-			code: code,
-			name: name,
-			minifigs: {},
-			color: color.OFF
-		};
-		panel[name] = info;
-		panelsByCode[code] = info;
-	};
+panel.prototype.removeMinifig = function(minifig) {
+	delete this.minifigs[minifig.name];
+};
 
-	add('ALL', 0);
-	add('CENTER', 1);
-	add('LEFT', 2);
-	add('RIGHT', 3);
+var add = function(name, code) {
+	if (name === 'byCode') {
+		return;
+	}
+	var info = new panel(name, code);
+	codes[code] = info;
+	names[name] = info;
+};
 
-	return panel;
-})();
+add('ALL', 0);
+add('CENTER', 1);
+add('LEFT', 2);
+add('RIGHT', 3);
+
+exports.codes = codes;
+exports.names = names;

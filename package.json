@@ -1,15 +1,16 @@
 {
-	"name": "toypad",
-	"version": "0.0.1",
-	"description": "Lego Dimensions Toy Pad custom library (with custom nfc tags defined) for NodeJS",
-	"main": "toypad.js",
-	"author": "Jonathan Foote <jf@jonathanfoote.com>",
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/jonyo/toypad.git"
-	},
- 	"dependencies": {
- 		"node-hid": "^0.5.1"
-	}
+  "name": "toypad",
+  "version": "0.0.1",
+  "description": "Lego Dimensions Toy Pad custom library (with custom nfc tags defined) for NodeJS",
+  "main": "toypad.js",
+  "author": "Jonathan Foote <jf@jonathanfoote.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonyo/toypad.git"
+  },
+  "dependencies": {
+    "node-hid": "^0.5.1",
+    "ws": "^6.0.0"
+  }
 }

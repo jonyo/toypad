@@ -27,6 +27,7 @@ module.exports = (function () {
 	add('BATMAN', '24 51 ba 0d 40 81');
 	add('GANDALF', '60 62 6a 08 40 80');
 	add('BATMOBILE', '66 d2 9a 70 40 80');
+	add('STICKER', '65 9e 22 4c 58 80');
 
 	return minifig;
 })();
