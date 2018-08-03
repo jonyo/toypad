@@ -89,7 +89,7 @@
 	// Status reporting code
 	// Use this to report missing hardware, plugin or unsupported browser
 	ext._getStatus = function () {
-		var myStatus = 0;
+		var myStatus = 1;
 		var myMsg = 'Not Connected to Gamepad';
 		if (connected) {
 			myStatus = 2;
@@ -116,7 +116,6 @@
 	}.bind(ext);
 
 	ext.minifigAdded = function(minifig, panel) {
-		console.log('polling minifigAdded for... ', panel, minifig);
 		if (!minifigsAdded[panel]) {
 			minifigsAdded[panel] = {};
 		}
