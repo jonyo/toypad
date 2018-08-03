@@ -65,22 +65,6 @@
 		return {status: myStatus, msg: myMsg};
 	};
 
-	// when the connect to server block is executed
-	ext.input = function (pin) {
-		console.log('input');
-		return;
-		if (connected == false) {
-			alert("Server Not Connected");
-		}
-		// validate the pin number for the mode
-		if (validatePin(pin)) {
-			var msg = JSON.stringify({
-				"command": 'input', 'pin': pin
-			});
-			socket.send(msg);
-		}
-	};
-
 	ext.updatePanel = function(panel, color, speed) {
 		console.log('updatePanel');
 		if (!connected) {
