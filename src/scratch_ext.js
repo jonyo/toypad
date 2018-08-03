@@ -7,7 +7,19 @@
 			SLOW: 1.0,
 			MEDIUM: 0.5,
 			FAST: 0.1
-		};
+		},
+		minifigs = [
+			'BOB', 'FRED', 'STICKER', 'WILDSTYLE', 'BATMAN', 'GANDOLF'
+		],
+		panels = ['ALL', 'LEFT', 'RIGHT', 'CENTER'];
+
+	// Fill in the starting values for the hat
+	for (var i = 0; i < panels.length; i++) {
+		for (var m = 0; m < minifigs.length; m++) {
+			minifigsAdded[panels[i]][minifigs[m]] = false;
+			minifigsRemoved[panels[i]][minifigs[m]] = false;
+		}
+	}
 
 	var addMinifig = function (panel, minifig) {
 		minifigAdded[panel][minifig] = true;
@@ -102,7 +114,7 @@
 	}.bind(ext);
 
 	ext.minifigAdded = function(minifig, panel) {
-		console.log('hat trick added');
+		console.log('polling minifigAdded for... ', panel, minifig);
 		if (!minifigsAdded[panel]) {
 			minifigsAdded[panel] = {};
 		}
@@ -113,7 +125,6 @@
 	}.bind(ext);
 
 	ext.minifigRemoved = function(minifig, panel) {
-		console.log('hat trick removed');
 		if (!minifigsRemoved[panel]) {
 			minifigsRemoved[panel] = {};
 		}
@@ -132,10 +143,10 @@
 			['w', 'set %m.panel color to %m.color %m.speed', 'updatePanel', 'ALL', 'OFF', 'SLOW']
 		],
 		menus: {
-			panel: ['ALL', 'LEFT', 'RIGHT', 'CENTER'],
+			panel: panels,
 			color: ['OFF', 'RED', 'GREEN', 'BLUE', 'PURPLE', 'WHITE'],
 			speed: ['SLOW', 'MEDIUM', 'FAST'],
-			minifig: ['BOB', 'FRED', 'STICKER', 'WILDSTYLE', 'BATMAN', 'GANDOLF'],
+			minifig: minifigs,
 		}
 	};
 
