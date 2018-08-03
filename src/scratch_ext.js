@@ -13,18 +13,19 @@
 
 	ext.cnct = function (callback) {
 		console.log('connecting...');
-		window.socket = new WebSocket("ws://127.0.0.1:8080");
-		window.socket.onopen = function () {
+		socket = new WebSocket("ws://127.0.0.1:8080");
+		socket.onopen = function () {
+			connected = true;
 			// give the connection time establish
 			window.setTimeout(function() {
 				callback();
 			}, 1000);
 		};
 
-		window.socket.onmessage = function (message) {
+		socket.onmessage = function (message) {
 			console.log('onmessage');
 			console.log(message);
-			var msg = JSON.parse(message.data);
+			var msg = JSON.parse(message);
 			console.log(msg);
 			return;
 
@@ -37,7 +38,7 @@
 			}
 			console.log(message.data)
 		};
-		window.socket.onclose = function (e) {
+		socket.onclose = function (e) {
 			console.log("Connection closed.");
 			socket = null;
 			connected = false;
@@ -49,12 +50,18 @@
 		var msg = JSON.stringify({
 			"command": "shutdown"
 		});
-		window.socket.send(msg);
+		socket.send(msg);
 	};
 
 	// Status reporting code
 	// Use this to report missing hardware, plugin or unsupported browser
-	ext._getStatus = function (status, msg) {
+	ext._getStatus = function () {
+		var myStatus = 1;
+		var myMsg = 'Not Connected to Gamepad';
+		if (connected) {
+			myStatus = 2;
+			myMsg = 'Toypad connected';
+		}
 		return {status: myStatus, msg: myMsg};
 	};
 
@@ -70,7 +77,7 @@
 			var msg = JSON.stringify({
 				"command": 'input', 'pin': pin
 			});
-			window.socket.send(msg);
+			socket.send(msg);
 		}
 	};
 
@@ -88,12 +95,17 @@
 			color: color,
 			speed: speed
 		};
-		window.socket.send(JSON.stringify(msg));
+		socket.send(JSON.stringify(msg));
 	}.bind(ext);
+
+	ext.minifigAdded = function(minifig, panel) {
+
+	};
 
 	// Block and block menu descriptions
 	var descriptor = {
 		blocks: [
+			['h', 'When %m.minifig added to %m.panel', ],
 			["w", 'Connect to the toypad.', 'cnct'],
 			['w', 'set %m.panel color to %m.color %m.speed', 'updatePanel', 'ALL', 'OFF', 'SLOW']
 		],
