@@ -39,9 +39,9 @@ wss.on('connection', function connection(ws) {
 			// do not care if it is not known minifig
 			return;
 		}
-		if (e.action === Action.ADD) {
+		if (e.action === toypad.actions.ADD) {
 			ws.send(JSON.stringify({command: 'minifigAdd', panel: e.panel, minifig: e.minifig}));
-		} else if (e.action === Action.REMOVE) {
+		} else if (e.action === toypad.actions.REMOVE) {
 			ws.send(JSON.stringify({command: 'minifigRemove', panel: e.panel, minifig: e.minifig}));
 		}
 	});

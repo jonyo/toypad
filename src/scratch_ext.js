@@ -125,7 +125,7 @@
 	var descriptor = {
 		blocks: [
 			['h', 'When %m.minifig added to %m.panel', 'minifigAdded', 'BOB', 'ALL'],
-			['h', 'When %m.minifig removed from %m.panel', 'minifigAdded', 'BOB', 'ALL'],
+			['h', 'When %m.minifig removed from %m.panel', 'minifigRemoved', 'BOB', 'ALL'],
 			["w", 'Connect to the toypad.', 'cnct'],
 			['w', 'set %m.panel color to %m.color %m.speed', 'updatePanel', 'ALL', 'OFF', 'SLOW']
 		],
