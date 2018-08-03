@@ -23,6 +23,7 @@
 
 		window.socket.onmessage = function (message) {
 			console.log('onmessage');
+			console.log(message);
 			var msg = JSON.parse(message.data);
 			console.log(msg);
 			return;
