@@ -9,7 +9,10 @@
 			FAST: 0.1
 		},
 		minifigs = [
-			'BOB', 'FRED', 'STICKER', 'WILDSTYLE', 'BATMAN', 'GANDOLF'
+			'WILDSTYLE', 'BATMAN', 'GANDOLF', 'BATMOBILE',
+
+			// Custom NFC Tags
+			'STEVE', 'MINECART', 'IRONMAN', 'IRONCAR', 'WENDY', 'WENDYCAR'
 		],
 		panels = ['ALL', 'LEFT', 'RIGHT', 'CENTER'];
 
