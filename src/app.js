@@ -4,11 +4,10 @@ const wss = new WebSocket.Server({ port: 8080 });
 
 const toypad = require('./toypad.js');
 
-
 wss.on('connection', function connection(ws) {
 	console.log('connection established...');
 	ws.on('message', function incoming(message) {
-		var data = JSON.stringify(message);
+		var data = JSON.parse(message);
 		switch (data.command) {
 			case 'updatePanel':
 				var panel = toypad.panels.names[data.panel] || null;
@@ -30,9 +29,20 @@ wss.on('connection', function connection(ws) {
 			default:
 				console.log('Unknown command', data.command);
 				console.log(data);
+				console.log(message);
 				break;
 		}
 	});
 
-	ws.send('something');
+	toypad.on('minifig-scan', function(e) {
+		if (!e.minifig) {
+			// do not care if it is not known minifig
+			return;
+		}
+		if (e.action === Action.ADD) {
+			ws.send(JSON.stringify({command: 'minifigAdd', panel: e.panel, minifig: e.minifig}));
+		} else if (e.action === Action.REMOVE) {
+			ws.send(JSON.stringify({command: 'minifigRemove', panel: e.panel, minifig: e.minifig}));
+		}
+	});
 });

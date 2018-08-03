@@ -16,14 +16,12 @@ toypad.on('connected', function() {
 toypad.on('minifig-scan', function(e) {
 	if (e.action === Action.ADD) {
 		console.log('Minifig Added...');
-		toypad.updatePanel(e.panel, Color.PURPLE, 0.7);
 		if (e.minifig) {
 			e.panel.addMinifig(e.minifig);
 			toypad.panels.names.ALL.addMinifig(e.minifig);
 		}
 	} else if (e.action === Action.REMOVE) {
 		console.log('Minifig Removed...');
-		toypad.updatePanel(e.panel, Color.OFF, 0.7);
 		if (e.minifig) {
 			e.panel.removeMinifig(e.minifig);
 			toypad.panels.names.ALL.removeMinifig(e.minifig);

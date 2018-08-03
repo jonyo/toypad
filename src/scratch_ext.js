@@ -1,14 +1,28 @@
 (function (ext) {
-	var socket = null;
+	var socket = null,
+		connected = false,
+		minifigsAdded = {},
+		minifigsRemoved = {},
+		speeds = {
+			SLOW: 1.0,
+			MEDIUM: 0.5,
+			FAST: 0.1
+		};
 
-	var connected = false;
+	var addMinifig = function (panel, minifig) {
+		minifigAdded[panel][minifig] = true;
+		minifigRemoved[panel][minifig] = false;
+		if (panel !== 'ALL') {
+			addMinifig('ALL', minifig);
+		}
+	};
 
-	var panels = {};
-
-	var speeds = {
-		SLOW: 1.0,
-		MEDIUM: 0.5,
-		FAST: 0.1
+	var removeMinifig = function (panel, minifig) {
+		minifigAdded[panel][minifig] = false;
+		minifigRemoved[panel][minifig] = true;
+		if (panel !== 'ALL') {
+			removeMinifig('ALL', minifig);
+		}
 	};
 
 	ext.cnct = function (callback) {
@@ -23,21 +37,26 @@
 		};
 
 		socket.onmessage = function (message) {
-			console.log('onmessage');
-			console.log(message);
-			var msg = JSON.parse(message);
-			console.log(msg);
-			return;
-
-			// handle the only reporter message from the server
-			// for changes in digital input state
-			var reporter = msg['report'];
-			if(reporter === 'digital_input_change') {
-				var pin = msg['pin'];
-				digital_inputs[parseInt(pin)] = msg['level']
+			var data = JSON.parse(message);
+			if (!data || !data.command) {
+				console.log('data received, not valid');
+				console.log(data);
+				console.log(message);
 			}
-			console.log(message.data)
+			console.log('message received');
+			console.log(data);
+
+			switch (data.command) {
+				case 'minifigAdd':
+					addMinifig(data.panel.name, data.minifig.name);
+					break;
+
+				case 'minifigRemove':
+					removeMinifig(data.panel.name, data.minifig.name);
+					break;
+			}
 		};
+
 		socket.onclose = function (e) {
 			console.log("Connection closed.");
 			socket = null;
@@ -83,20 +102,38 @@
 	}.bind(ext);
 
 	ext.minifigAdded = function(minifig, panel) {
+		if (!minifigsAdded[panel]) {
+			minifigsAdded[panel] = {};
+		}
+		var added = minifigsAdded[panel][minifig] || false;
+		// "consume" the added minifig
+		minifigsAdded[panel][minifig] = false;
+		return added;
+	}.bind(ext);
 
+	ext.minifigRemoved = function(minifig, panel) {
+		if (!minifigsRemoved[panel]) {
+			minifigsRemoved[panel] = {};
+		}
+		var removed = minifigsRemoved[panel][minifig] || false;
+		// "consume" the removed minifig
+		minifigsRemoved[panel][minifig] = false;
+		return removed;
 	};
 
 	// Block and block menu descriptions
 	var descriptor = {
 		blocks: [
-			['h', 'When %m.minifig added to %m.panel', ],
+			['h', 'When %m.minifig added to %m.panel', 'minifigAdded', 'BOB', 'ALL'],
+			['h', 'When %m.minifig removed from %m.panel', 'minifigAdded', 'BOB', 'ALL'],
 			["w", 'Connect to the toypad.', 'cnct'],
 			['w', 'set %m.panel color to %m.color %m.speed', 'updatePanel', 'ALL', 'OFF', 'SLOW']
 		],
 		menus: {
 			panel: ['ALL', 'LEFT', 'RIGHT', 'CENTER'],
 			color: ['OFF', 'RED', 'GREEN', 'BLUE', 'PURPLE', 'WHITE'],
-			speed: ['SLOW', 'MEDIUM', 'FAST']
+			speed: ['SLOW', 'MEDIUM', 'FAST'],
+			minifig: ['BOB', 'FRED', 'STICKER', 'WILDSTYLE', 'BATMAN', 'GANDOLF'],
 		}
 	};
 
