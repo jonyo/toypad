@@ -102,6 +102,7 @@
 	}.bind(ext);
 
 	ext.minifigAdded = function(minifig, panel) {
+		console.log('hat trick added');
 		if (!minifigsAdded[panel]) {
 			minifigsAdded[panel] = {};
 		}
@@ -112,6 +113,7 @@
 	}.bind(ext);
 
 	ext.minifigRemoved = function(minifig, panel) {
+		console.log('hat trick removed');
 		if (!minifigsRemoved[panel]) {
 			minifigsRemoved[panel] = {};
 		}
@@ -119,7 +121,7 @@
 		// "consume" the removed minifig
 		minifigsRemoved[panel][minifig] = false;
 		return removed;
-	};
+	}.bind(ext);
 
 	// Block and block menu descriptions
 	var descriptor = {
