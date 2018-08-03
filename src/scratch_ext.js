@@ -27,6 +27,8 @@
 	}
 
 	var addMinifig = function (panel, minifig) {
+		console.log('addMinifig');
+		console.log(panel, minifig);
 		minifigAdded[panel][minifig] = true;
 		minifigRemoved[panel][minifig] = false;
 		if (panel !== 'ALL') {
@@ -35,6 +37,8 @@
 	};
 
 	var removeMinifig = function (panel, minifig) {
+		console.log('removeMinifig');
+		console.log(panel, minifig);
 		minifigAdded[panel][minifig] = false;
 		minifigRemoved[panel][minifig] = true;
 		if (panel !== 'ALL') {
@@ -44,9 +48,14 @@
 
 	ext.cnct = function (callback) {
 		console.log('connecting...');
+		if (connected) {
+			console.log('already connected');
+			return;
+		}
 		socket = new WebSocket("ws://127.0.0.1:8080");
 		socket.onopen = function () {
 			connected = true;
+			console.log('connected.');
 			// give the connection time establish
 			window.setTimeout(function() {
 				callback();
@@ -54,13 +63,14 @@
 		};
 
 		socket.onmessage = function (message) {
+			console.log('got message...');
+			console.log(message);
 			var data = JSON.parse(message);
 			if (!data || !data.command) {
-				console.log('data received, not valid');
+				console.log('invalid message, not json or no command');
 				console.log(data);
-				console.log(message);
 			}
-			console.log('message received');
+			console.log('parsed message:');
 			console.log(data);
 
 			switch (data.command) {
