@@ -129,23 +129,19 @@
 	}.bind(ext);
 
 	ext.minifigAdded = function(minifig, panel) {
-		if (!minifigsAdded[panel]) {
-			minifigsAdded[panel] = {};
+		if (minifigsAdded[panel][minifig]) {
+			minifigsAdded[panel][minifig] = false;
+			return true;
 		}
-		var added = minifigsAdded[panel][minifig] || false;
-		// "consume" the added minifig
-		minifigsAdded[panel][minifig] = false;
-		return added;
+		return false;
 	}.bind(ext);
 
 	ext.minifigRemoved = function(minifig, panel) {
-		if (!minifigsRemoved[panel]) {
-			minifigsRemoved[panel] = {};
+		if (minifigsRemoved[panel][minifig]) {
+			minifigsRemoved[panel][minifig] = false;
+			return true;
 		}
-		var removed = minifigsRemoved[panel][minifig] || false;
-		// "consume" the removed minifig
-		minifigsRemoved[panel][minifig] = false;
-		return removed;
+		return false;
 	}.bind(ext);
 
 	// Block and block menu descriptions
