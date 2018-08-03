@@ -12,6 +12,7 @@
 	};
 
 	ext.cnct = function (callback) {
+		console.log('connecting...');
 		window.socket = new WebSocket("ws://127.0.0.1:8080");
 		window.socket.onopen = function () {
 			// give the connection time establish
@@ -21,6 +22,7 @@
 		};
 
 		window.socket.onmessage = function (message) {
+			console.log('onmessage');
 			var msg = JSON.parse(message.data);
 			console.log(msg);
 			return;
