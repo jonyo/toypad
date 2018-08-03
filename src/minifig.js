@@ -28,6 +28,8 @@ module.exports = (function () {
 	add('GANDALF', '60 62 6a 08 40 80');
 	add('BATMOBILE', '66 d2 9a 70 40 80');
 	add('STICKER', '65 9e 22 4c 58 80');
+	add('BOB', '7c 9e 22 4c 58 80');
+	add('FRED', '7a 9e 22 4c 58 80');
 
 	return minifig;
 })();
