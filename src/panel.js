@@ -18,9 +18,6 @@ panel.prototype.removeMinifig = function(minifig) {
 };
 
 var add = function(name, code) {
-	if (name === 'byCode') {
-		return;
-	}
 	var info = new panel(name, code);
 	codes[code] = info;
 	names[name] = info;

@@ -1,26 +1,19 @@
-module.exports = (function() {
-	var actionsByCode = {};
-	var action = function (){};
+var codes = {},
+	names = {};
 
-	action.prototype.byCode = function(code) {
-		return actionsByCode[code] || null;
-	}
+var action = function (name, code){
+	this.code = code;
+	this.name = name;
+};
 
-	var add = function(name, code) {
-		if (name === 'byCode') {
-			return;
-		}
-		var act = {
-			code: code,
-			name: name
-		};
-		action[name] = act;
-		actionsByCode[code] = act;
-	};
+var add = function(name, code) {
+	var info = new action(name, code);
+	codes[code] = info;
+	names[name] = info;
+};
 
+add('ADD', 0);
+add('REMOVE', 1);
 
-	add('ADD', 0);
-	add('REMOVE', 1);
-
-	return action;
-})();
+exports.codes = codes;
+exports.names = names;
