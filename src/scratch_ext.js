@@ -6,7 +6,7 @@
 		speeds = {
 			SLOW: 1.0,
 			MEDIUM: 0.5,
-			FAST: 0.1
+			FAST: 0
 		},
 		minifigs = [
 			'WILDSTYLE', 'BATMAN', 'GANDOLF', 'BATMOBILE',
