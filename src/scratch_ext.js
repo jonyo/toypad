@@ -103,7 +103,7 @@
 	// Use this to report missing hardware, plugin or unsupported browser
 	ext._getStatus = function () {
 		var myStatus = 1;
-		var myMsg = 'Not Connected to Gamepad';
+		var myMsg = 'Not Connected to Toypad';
 		if (connected) {
 			myStatus = 2;
 			myMsg = 'Toypad connected';
