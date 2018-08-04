@@ -50,6 +50,7 @@
 		console.log('connecting...');
 		if (connected) {
 			console.log('already connected');
+			callback();
 			return;
 		}
 		socket = new WebSocket("ws://127.0.0.1:8080");

@@ -102,7 +102,9 @@ module.exports = (function () {
 	};
 
 	device.prototype.updatePanel = function(panel, color, opt_speed) {
-		if (typeof opt_speed !== 'number') {
+		if (typeof opt_speed === 'string') {
+			opt_speed = parseFloat(opt_speed);
+		} else if (opt_speed !== 'number') {
 			opt_speed = 0.7;
 		}
 		var data = [
