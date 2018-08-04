@@ -29,8 +29,8 @@
 	var addMinifig = function (panel, minifig) {
 		console.log('addMinifig');
 		console.log(panel, minifig);
-		minifigAdded[panel][minifig] = true;
-		minifigRemoved[panel][minifig] = false;
+		minifigsAdded[panel][minifig] = true;
+		minifigsRemoved[panel][minifig] = false;
 		if (panel !== 'ALL') {
 			addMinifig('ALL', minifig);
 		}
@@ -39,8 +39,8 @@
 	var removeMinifig = function (panel, minifig) {
 		console.log('removeMinifig');
 		console.log(panel, minifig);
-		minifigAdded[panel][minifig] = false;
-		minifigRemoved[panel][minifig] = true;
+		minifigsAdded[panel][minifig] = false;
+		minifigsRemoved[panel][minifig] = true;
 		if (panel !== 'ALL') {
 			removeMinifig('ALL', minifig);
 		}
