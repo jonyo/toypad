@@ -65,7 +65,7 @@
 		socket.onmessage = function (message) {
 			console.log('got message...');
 			console.log(message);
-			var data = JSON.parse(message);
+			var data = JSON.parse(message.data);
 			if (!data || !data.command) {
 				console.log('invalid message, not json or no command');
 				console.log(data);
