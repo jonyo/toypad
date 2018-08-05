@@ -56,11 +56,8 @@
 		socket = new WebSocket("ws://127.0.0.1:8080");
 		socket.onopen = function () {
 			connected = true;
-			console.log('connected.');
-			// give the connection time establish
-			window.setTimeout(function() {
-				callback();
-			}, 1000);
+			console.log('connected to toypad.');
+			callback();
 		};
 
 		socket.onmessage = function (message) {
@@ -112,8 +109,8 @@
 		return {status: myStatus, msg: myMsg};
 	};
 
-	ext.updatePanel = function(panel, color, speed) {
-		console.log('updatePanel');
+	ext.fadePanel = function(panel, color, speed) {
+		console.log('fadePanel');
 		if (!connected) {
 			console.log('Not connected to server!');
 			return;
@@ -121,7 +118,7 @@
 		speed = speeds[speed];
 		console.log(speed, color, panel);
 		msg = {
-			command: 'updatePanel',
+			command: 'fadePanel',
 			panel: panel,
 			color: color,
 			speed: speed
@@ -151,7 +148,7 @@
 			['h', 'When %m.minifig added to %m.panel', 'minifigAdded', 'STEVE', 'ALL'],
 			['h', 'When %m.minifig removed from %m.panel', 'minifigRemoved', 'STEVE', 'ALL'],
 			["w", 'Connect to the toypad.', 'cnct'],
-			['w', 'set %m.panel color to %m.color %m.speed', 'updatePanel', 'ALL', 'OFF', 'SLOW']
+			['w', 'Fade %m.panel color to %m.color %m.speed', 'fadePanel', 'ALL', 'OFF', 'SLOW']
 		],
 		menus: {
 			panel: panels,
