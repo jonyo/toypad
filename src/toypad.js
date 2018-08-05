@@ -1,6 +1,4 @@
-var Device = require('./device.js'),
-	Minifig = require('./minifig.js'),
-	Color = require('./color.js');
+var Device = require('./device.js');
 
 
 var toypad = new Device();
@@ -11,7 +9,7 @@ toypad.on('connected', function() {
 	console.log('connected');
 });
 
-// Simple thing to change any panel with a minifig on it to purple
+// keep track of what minifig is on what panel
 toypad.on('minifig-scan', function(e) {
 	if (e.action === toypad.actions.ADD) {
 		console.log('Minifig Added...');

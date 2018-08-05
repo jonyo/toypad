@@ -1,32 +1,36 @@
-var codes = {},
-	names = {},
-	color = require('./color.js');
+let codes = {},
+	names = {};
+// todo...
+var color = require('./color.js');
 
-var panel = function (name, code){
-	this.code = code;
-	this.name = name;
-	this.minifigs = {};
-	this.color = color.OFF;
-};
+class Panel {
+	constructor (name, code) {
+		this.name = name;
+		this.code = code;
+		this.minifigs = {};
+		this.color = color.OFF;
+	}
 
-panel.prototype.addMinifig = function(minifig) {
-	this.minifigs[minifig.name] = minifig;
-};
+	addMinifig (minifig) {
+		this.minifigs[minifig.name] = minifig;
+	}
 
-panel.prototype.removeMinifig = function(minifig) {
-	delete this.minifigs[minifig.name];
-};
+	removeMinifig (minifig) {
+		delete this.minifigs[minifig.name];
+	}
 
-var add = function(name, code) {
-	var info = new panel(name, code);
-	codes[code] = info;
-	names[name] = info;
-};
+	static add (name, code) {
+		var panel = new Panel(name, code);
+		codes[code] = panel;
+		names[name] = panel;
+	}
+}
 
-add('ALL', 0);
-add('CENTER', 1);
-add('LEFT', 2);
-add('RIGHT', 3);
+// initialize panels
+Panel.add('ALL', 0);
+Panel.add('CENTER', 1);
+Panel.add('LEFT', 2);
+Panel.add('RIGHT', 3);
 
 exports.codes = codes;
 exports.names = names;

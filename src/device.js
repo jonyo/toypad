@@ -1,123 +1,145 @@
-module.exports = (function () {
-	var EventEmitter = require('events').EventEmitter,
-		util = require('util'),
-		HID = require('node-hid'),
-		Minifig = new (require('./minifig.js'))(),
-		Action = require('./action.js'),
-		Panel = require('./panel.js'),
-		PRODUCT_ID_ = 0x0241,
-		VENDOR_ID_ = 0x0e6f;
+const EventEmitter = require('events');
+const HID = require('node-hid');
+const Minifig = require ('./minifig.js');
+const Action = require('./action.js');
+const Panel = require('./panel.js');
+const Color = require('./color.js');
+const VENDOR_ID = 0x0e6f;
+const PRODUCT_ID = 0x0241;
 
-	var device = function() {
-		EventEmitter.call(this);
-		this.hidDevice_ = null;
-		this.colourUpdateNumber_ = 0;
-		// expose things on the device api
-		this.panels = Panel;
-		this.colors = require('./color.js');
-		this.minifigs = Minifig;
-		this.actions = Action.names;
-	};
+class Device extends EventEmitter {
+	constructor () {
+		super();
+		this.hid = null;
+		this.colorUpdateNumber = 0;
+	}
 
-	util.inherits(device, EventEmitter);
+	get panels () {
+		return Panel.names;
+	}
 
-	device.prototype.connect = function() {
-		this.hidDevice_ = new HID.HID(VENDOR_ID_, PRODUCT_ID_);
+	get colors () {
+		return Color.names;
+	}
 
-		this.hidDevice_.on('data', function(data) {
-			var cmd = data[1];
-			if (cmd == 0x0b) {
-				// minifg scanned
-				var panel = Panel.codes[data[2]] || null;
-				var action = Action.codes[data[5]] || null;
-				var signature = getHexSignature(data.slice(7, 13));
-				this.emit('minifig-scan', {
-					'panel': panel,
-					'action': action,
-					'minifig': Minifig.byId(signature),
-					'id': signature
-				});
-			} else if (cmd == 0x01) {
-				// LED change
-				console.log('led-change', data);
-			} else if (cmd == 0x19) {
-				// connected
-				this.emit('connected');
-			} else {
-				console.log('unknown toypad command', data);
-			}
-		}.bind(this));
+	get minifigs () {
+		return Minifig.names;
+	}
 
-		this.hidDevice_.on('error', function(error) {
-			this.emit('error', error);
-		}.bind(this));
+	get actions () {
+		return Action.names;
+	}
 
-		this.hidDevice_.write([0x00,
-			0x55, 0x0f, 0xb0, 0x01,
-			0x28, 0x63, 0x29, 0x20,
-			0x4c, 0x45, 0x47, 0x4f,
-			0x20, 0x32, 0x30, 0x31,
-			0x34, 0xf7, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00,
-			0x00, 0x00, 0x00, 0x00]);
-	};
+	connect () {
+		if (this.hid) {
+			// already connected... disconnect and re-connect ??
+			this.disconnect();
+		}
+		this.hid = new HID.HID(VENDOR_ID, PRODUCT_ID);
 
-	device.prototype.disconnect = function () {
-		if (!this.hidDevice_) {
+		this.hid.on('data', this._onHidData.bind(this));
+		this.hid.on('error', this._onHidError.bind(this));
+
+		// Initialize handshake
+		this.hid.write([
+			0x00, 0x55, 0x0f, 0xb0, 0x01, 0x28, 0x63, 0x29, 0x20, 0x4c, 0x45, 0x47, 0x4f, 0x20, 0x32, 0x30, 0x31,
+			0x34, 0xf7, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+		]);
+	}
+
+	disconnect () {
+		if (!this.hid) {
 			return;
 		}
-		this.hidDevice_.close();
-	};
+		this.hid.close();
+		this.hid = null;
+	}
 
-	var getHexSignature = function (buffer) {
-		var signature = '';
-		for (var i = 0; i < buffer.length; i++) {
-		signature +=
-			((buffer[i] >> 4) & 0xF).toString(16) +
-			(buffer[i] & 0xF).toString(16) +
-			' ';
+	fadePanel (panel, color, speed) {
+		if (typeof speed === 'string') {
+			speed = parseFloat(speed);
+		} else if (typeof speed !== 'number') {
+			speed = 0.7;
 		}
-		return signature.trim();
-	};
+		var data = [
+			this.colorUpdateNumber & 0xFF,
+			panel.code,
+			((1 - speed) * 0xFF) & 0xFF,
+			0x01, (color.code >> 16) & 0xFF,
+			(color.code >> 8) & 0xFF,
+			color.code & 0xFF
+		];
+		this._write([0x55, 0x08, 0xc2].concat(data));
+		this.colorUpdateNumber++;
+	}
 
-	var checksum = function(data) {
+	changePanel (panel, color) {
+		// todo...
+	}
+
+	_onHidData (data) {
+		console.log('got data');
+		var cmd = data[1];
+
+		if (cmd === 0x0b) {
+			// minifg scanned
+			console.log('minifig-scan');
+			console.log(this);
+			console.log(this.listenerCount('minifig-scan'));
+			var uid = Minifig.Minifig.bufferToUid(data.slice(7, 13));
+			this.emit(
+				'minifig-scan',
+				{
+					'panel': Panel.codes[data[2]] || null,
+					'action': Action.codes[data[5]] || null,
+					'minifig': Minifig.uids[uid] || null,
+					'uid': uid
+				}
+			);
+		} else if (cmd === 0x01) {
+			// LED change
+			console.log('led-change', data);
+		} else if (cmd === 0x19) {
+			// connected
+			this.emit('connected');
+		} else {
+			console.log('unknown toypad command', data);
+		}
+	}
+
+	_onHidError (error) {
+		this.emit('error', error);
+	}
+
+	_write (data) {
+		if (!this.hid) {
+			console.log('Cannot write, not connected to toypad.');
+			return;
+		}
+		this.hid.write(
+			[0x00].concat(
+				this._pad(
+					this._checksum(data)
+				)
+			)
+		);
+	}
+
+	_checksum (data) {
 		var checksum = 0;
 		for (var i = 0; i < data.length; i++) {
 			checksum += data[i];
 		}
 		data.push(checksum & 0xFF);
 		return data;
-	};
+	}
 
-	var pad = function(data) {
+	_pad (data) {
 		while(data.length < 32) {
 			data.push(0x00);
 		}
 		return data;
-	};
+	}
+}
 
-	device.prototype.write = function(data) {
-		this.hidDevice_.write([0x00].concat(pad(checksum(data))));
-	};
-
-	device.prototype.updatePanel = function(panel, color, opt_speed) {
-		if (typeof opt_speed === 'string') {
-			opt_speed = parseFloat(opt_speed);
-		} else if (opt_speed !== 'number') {
-			opt_speed = 0.7;
-		}
-		var data = [
-		this.colourUpdateNumber_ & 0xFF,
-		panel.code,
-		((1 - opt_speed) * 0xFF) & 0xFF,
-		0x01, (color >> 16) & 0xFF,
-		(color >> 8) & 0xFF,
-		color & 0xFF
-		];
-
-		this.colourUpdateNumber_++;
-		this.write([0x55, 0x08, 0xc2].concat(data));
-	};
-	return device;
-})();
+module.exports = Device;

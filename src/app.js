@@ -1,35 +1,44 @@
-var Device = require('./device.js'),
-	WebSocket = require('ws'),
-	wss = new WebSocket.Server({ port: 8080 }),
+const Device = require('./device.js');
+const WebSocket = require('ws');
+
+let wss = new WebSocket.Server({ port: 8080 }),
 	toypad = new Device(),
 	socket = null;
 
-toypad.connect();
+console.log(toypad);
+
 
 toypad.on('connected', function() {
 	console.log('connected to toypad');
 });
 
+toypad.connect();
+
 toypad.on('minifig-scan', function(e) {
+	console.log('received minifig-scan');
+	console.log(e);
+	console.log(toypad.actions);
 	if (!e.minifig) {
 		// do not care if it is not known minifig
-		console.log('minifig added but unknown so ignoring...');
+		console.log('unknown minifig, ignoring...');
 		return;
 	}
 	if (!socket) {
-		console.log('No connection established so no commands to send');
+		console.log('No connection established to scratch');
 		return;
 	}
 	if (e.action === toypad.actions.ADD) {
-		console.log('sending minifigAdd command');
+		console.log('sending minifigAdd command to scratch');
 		socket.send(JSON.stringify({command: 'minifigAdd', panel: e.panel, minifig: e.minifig}));
 	} else if (e.action === toypad.actions.REMOVE) {
-		console.log('sending minifigRemove command');
+		console.log('sending minifigRemove command to scratch');
 		socket.send(JSON.stringify({command: 'minifigRemove', panel: e.panel, minifig: e.minifig}));
 	} else {
 		console.log('action not known... ', e.action);
 	}
 });
+
+console.log('count', toypad.listenerCount('minifig-scan'));
 
 wss.on('connection', function connection(ws) {
 	console.log('connection established to scratch extension...');
@@ -37,8 +46,9 @@ wss.on('connection', function connection(ws) {
 	ws.on('message', function incoming(message) {
 		var data = JSON.parse(message);
 		switch (data.command) {
-			case 'updatePanel':
-				var panel = toypad.panels.names[data.panel] || null;
+			case 'fadePanel':
+				console.log('Received fadePanel from scratch');
+				var panel = toypad.panels[data.panel] || null;
 				if (!panel) {
 					return;
 				}
@@ -47,17 +57,17 @@ wss.on('connection', function connection(ws) {
 					return;
 				}
 				var speed = data.speed;
-				toypad.updatePanel(panel, color, speed);
+				toypad.fadePanel(panel, color, speed);
 				break;
 
 			case 'shutdown':
 				// todo: anything to do?
+				console.log('shutdown received from scratch');
 				break;
 
 			default:
-				console.log('Unknown command', data.command);
+				console.log('Unknown command received from scratch', data.command);
 				console.log(data);
-				console.log(message);
 				break;
 		}
 	});

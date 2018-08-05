@@ -1,19 +1,21 @@
-var codes = {},
+let codes = {},
 	names = {};
 
-var action = function (name, code){
-	this.code = code;
-	this.name = name;
-};
+class Action {
+	constructor (name, code) {
+		this.name = name;
+		this.code = code;
+	}
 
-var add = function(name, code) {
-	var info = new action(name, code);
-	codes[code] = info;
-	names[name] = info;
-};
+	static add (name, code) {
+		var action = new Action(name, code);
+		codes[code] = action;
+		names[name] = action;
+	}
+}
 
-add('ADD', 0);
-add('REMOVE', 1);
+Action.add('ADD', 0);
+Action.add('REMOVE', 1);
 
 exports.codes = codes;
 exports.names = names;
