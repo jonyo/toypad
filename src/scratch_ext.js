@@ -4,9 +4,9 @@
 		minifigsAdded = {},
 		minifigsRemoved = {},
 		speeds = {
-			SLOW: 1.0,
+			SLOW: 0,
 			MEDIUM: 0.5,
-			FAST: 0
+			FAST: 1.0
 		},
 		minifigs = [
 			'WILDSTYLE', 'BATMAN', 'GANDOLF', 'BATMOBILE',
