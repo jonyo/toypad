@@ -112,7 +112,7 @@
 	ext.fadePanel = function(panel, color, speed) {
 		console.log('fadePanel');
 		if (!connected) {
-			console.log('Not connected to server!');
+			console.log('Not connected to toypad!');
 			return;
 		}
 		speed = speeds[speed];
@@ -122,6 +122,20 @@
 			panel: panel,
 			color: color,
 			speed: speed
+		};
+		socket.send(JSON.stringify(msg));
+	}.bind(ext);
+
+	ext.changePanel = function(panel, color) {
+		console.log('changePanel');
+		if (!connected) {
+			console.log('Not connected to toypad!');
+			return;
+		}
+		msg = {
+			command: 'changePanel',
+			panel: panel,
+			color: color
 		};
 		socket.send(JSON.stringify(msg));
 	}.bind(ext);
@@ -147,14 +161,15 @@
 		blocks: [
 			['h', 'When %m.minifig added to %m.panel', 'minifigAdded', 'STEVE', 'ALL'],
 			['h', 'When %m.minifig removed from %m.panel', 'minifigRemoved', 'STEVE', 'ALL'],
-			["w", 'Connect to the toypad.', 'cnct'],
-			['w', 'Fade %m.panel color to %m.color %m.speed', 'fadePanel', 'ALL', 'OFF', 'SLOW']
+			['w', 'Connect to the toypad.', 'cnct'],
+			[' ', 'Fade %m.panel color to %m.color %m.speed', 'fadePanel', 'ALL', 'WHITE', 'FAST']
+			[' ', 'Change %m.panel color to %m.color', 'changePanel', 'ALL', 'WHITE']
 		],
 		menus: {
 			panel: panels,
 			color: ['OFF', 'RED', 'GREEN', 'BLUE', 'PURPLE', 'WHITE'],
 			speed: ['SLOW', 'MEDIUM', 'FAST'],
-			minifig: minifigs,
+			minifig: minifigs
 		}
 	};
 
