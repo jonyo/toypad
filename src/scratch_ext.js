@@ -162,7 +162,7 @@
 			['h', 'When %m.minifig added to %m.panel', 'minifigAdded', 'STEVE', 'ALL'],
 			['h', 'When %m.minifig removed from %m.panel', 'minifigRemoved', 'STEVE', 'ALL'],
 			['w', 'Connect to the toypad.', 'cnct'],
-			[' ', 'Fade %m.panel color to %m.color %m.speed', 'fadePanel', 'ALL', 'WHITE', 'FAST']
+			[' ', 'Fade %m.panel color to %m.color %m.speed', 'fadePanel', 'ALL', 'WHITE', 'FAST'],
 			[' ', 'Change %m.panel color to %m.color', 'changePanel', 'ALL', 'WHITE']
 		],
 		menus: {
