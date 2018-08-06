@@ -55,17 +55,21 @@ class Device extends EventEmitter {
 		this.hid = null;
 	}
 
-	fadePanel (panel, color, speed) {
-		if (typeof speed === 'string') {
-			speed = parseFloat(speed);
-		} else if (typeof speed !== 'number') {
-			speed = 0.7;
-		}
+	/**
+	 * Fade the pad color to the given color, taking the amount of seconds specified.
+	 *
+	 * @param  {object} panel
+	 * @param  {object} color
+	 * @param  {number} seconds Number of seconds to take when fading to the new color, from 0-16 seconds
+	 */
+	fadePanel (panel, color, seconds) {
+		var speed = seconds * 16;
 		var data = [
 			this.colorUpdateNumber & 0xFF,
 			panel.code,
-			((1 - speed) * 0xFF) & 0xFF,
-			0x01, (color.code >> 16) & 0xFF,
+			speed & 0xff,
+			0x01,
+			(color.code >> 16) & 0xFF,
 			(color.code >> 8) & 0xFF,
 			color.code & 0xFF
 		];
