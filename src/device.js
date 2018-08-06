@@ -30,6 +30,9 @@ class Device extends EventEmitter {
 		return Action.names;
 	}
 
+	/**
+	 * Connect to the toypad
+	 */
 	connect () {
 		if (this.hid) {
 			// already connected... disconnect and re-connect ??
@@ -47,6 +50,9 @@ class Device extends EventEmitter {
 		]);
 	}
 
+	/**
+	 * Disconnect from the toypad
+	 */
 	disconnect () {
 		if (!this.hid) {
 			return;
@@ -56,19 +62,41 @@ class Device extends EventEmitter {
 	}
 
 	/**
-	 * Fade the pad color to the given color, taking the amount of seconds specified.
-	 *
-	 * @param  {object} panel
-	 * @param  {object} color
-	 * @param  {number} seconds Number of seconds to take when fading to the new color, from 0-16 seconds
+	 * Change the panel color to the new color instantly.
+	 * @param {object} panel
+	 * @param {object} color
 	 */
-	fadePanel (panel, color, seconds) {
-		var speed = seconds * 16;
+	panelChange (panel, color) {
 		var data = [
 			this.colorUpdateNumber & 0xFF,
 			panel.code,
-			speed & 0xff,
-			0x01,
+			(color.code >> 16) & 0xFF,
+			(color.code >> 8) & 0xFF,
+			color.code & 0xFF
+		];
+		this._write([0x55, 0x06, 0xc0].concat(data));
+		this.colorUpdateNumber++;
+	}
+
+	/**
+	 * Fade the pad color to the given color, optionally pulsing by using changeCount > 1.  When pulsing, it will go
+	 * between the new color, and previous color.
+	 * @param {object} panel
+	 * @param {object} color
+	 * @param {number} secondsPerChange Number of seconds to take when fading to the new color. Valid range is
+	 * from 0 - 15.9 seconds. If use 0 seconds it will not use this color on the next pulse or flash, it is better to
+	 * use panelChange instead of 0 seconds for panelFade to avoid unexpected behavior.
+	 * @param {number} changeCount Number of times to change colors, valid range is 0-255.
+	 * Odd number: color ends on the new color and stays on the color
+	 * Even number: color ends on the previous color and stays on that color
+	 * If >= 200 it will continue to fade between colors forever until next color change for the pad is sent.
+	 */
+	panelFade (panel, color, secondsPerChange, changeCount) {
+		var data = [
+			this.colorUpdateNumber & 0xFF,
+			panel.code,
+			(secondsPerChange * 16) & 0xff,
+			changeCount & 0xff,
 			(color.code >> 16) & 0xFF,
 			(color.code >> 8) & 0xFF,
 			color.code & 0xFF
@@ -77,10 +105,38 @@ class Device extends EventEmitter {
 		this.colorUpdateNumber++;
 	}
 
-	changePanel (panel, color) {
-		// todo...
+	/**
+	 * Flash the pad color from the existing color to the onColor without fading between colors.
+	 * @param {object} panel
+	 * @param {object} onColor This is the color to flash "too"
+	 * @param {number} onSecondsPerChange Number of seconds to show the onColor each change. Valid range is 0 - 15.9
+	 * @param {number} offSecondsPerChange Number of seconds to show the previous color when it is flashing the
+	 * previous color. Valid range is 0 - 15.9
+	 * @param {number} changeCount Number of times to change colors, valid range is 0-255.
+	 * Odd number: color ends on the new color and stays on the color
+	 * Even number: color ends on the previous color and stays on that color
+	 * If >= 199 it will continue to flash forever until next color change for the pad is sent.
+	 */
+	panelFlash (panel, onColor, onSecondsPerChange, offSecondsPerChange, changeCount) {
+		var data = [
+			this.colorUpdateNumber & 0xFF,
+			panel.code,
+			(onSecondsPerChange * 16) & 0xff,
+			(offSecondsPerChange * 16) & 0xff,
+			changeCount & 0xff,
+			(onColor.code >> 16) & 0xFF,
+			(onColor.code >> 8) & 0xFF,
+			onColor.code & 0xFF
+		];
+		this._write([0x55, 0x09, 0xc3].concat(data));
+		this.colorUpdateNumber++;
 	}
 
+	/**
+	 * Internal handler when data is emitted from HID.  Handles emitting an appropriate event depending on the data.
+	 * @param {string} data
+	 * @private
+	 */
 	_onHidData (data) {
 		console.log('got data');
 		var cmd = data[1];
@@ -111,10 +167,20 @@ class Device extends EventEmitter {
 		}
 	}
 
+	/**
+	 * Handler used internally when error is emitted by HID
+	 * @param {object} error
+	 * @private
+	 */
 	_onHidError (error) {
 		this.emit('error', error);
 	}
 
+	/**
+	 * Internal method to write data to the HID device, adding padding and checksum automatically.
+	 * @param {string} data Data to write
+	 * @private
+	 */
 	_write (data) {
 		if (!this.hid) {
 			console.log('Cannot write, not connected to toypad.');
@@ -129,6 +195,12 @@ class Device extends EventEmitter {
 		);
 	}
 
+	/**
+	 * Used internally to add checksum to the data.
+	 * @param {string} data
+	 * @return {string} Data with checksum added
+	 * @private
+	 */
 	_checksum (data) {
 		var checksum = 0;
 		for (var i = 0; i < data.length; i++) {
@@ -138,6 +210,12 @@ class Device extends EventEmitter {
 		return data;
 	}
 
+	/**
+	 * Used internally to pad the data with 0 up to 32 bytes
+	 * @param {string} data
+	 * @return {string} Data with padding added
+	 * @private
+	 */
 	_pad (data) {
 		while(data.length < 32) {
 			data.push(0x00);

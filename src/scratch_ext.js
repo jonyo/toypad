@@ -3,11 +3,6 @@
 		connected = false,
 		minifigsAdded = {},
 		minifigsRemoved = {},
-		speeds = {
-			SLOW: 0,
-			MEDIUM: 0.5,
-			FAST: 1.0
-		},
 		minifigs = [
 			'WILDSTYLE', 'BATMAN', 'GANDOLF', 'BATMOBILE',
 
@@ -109,33 +104,56 @@
 		return {status: myStatus, msg: myMsg};
 	};
 
-	ext.fadePanel = function(panel, color, speed) {
-		console.log('fadePanel');
+	ext.panelChange = function(panel, color) {
+		console.log('panelChange');
 		if (!connected) {
 			console.log('Not connected to toypad!');
 			return;
 		}
-		speed = speeds[speed];
-		console.log(speed, color, panel);
 		msg = {
-			command: 'fadePanel',
+			command: 'panelChange',
 			panel: panel,
-			color: color,
-			speed: speed
+			color: color
 		};
 		socket.send(JSON.stringify(msg));
 	}.bind(ext);
 
-	ext.changePanel = function(panel, color) {
-		console.log('changePanel');
+	ext.panelFade = function(panel, color, secondsPerChange) {
+		console.log('panelFade');
+		this.panelPulse(panel, color, 1, secondsPerChange);
+	}.bind(ext);
+
+	ext.panelPulse = function(panel, color, changeCount, secondsPerChange) {
+		console.log('panelPulse');
 		if (!connected) {
 			console.log('Not connected to toypad!');
 			return;
 		}
+		console.log(panel, color, secondsPerChange);
 		msg = {
-			command: 'changePanel',
+			command: 'panelFade',
 			panel: panel,
-			color: color
+			color: color,
+			secondsPerChange: secondsPerChange,
+			changeCount: changeCount
+		};
+		socket.send(JSON.stringify(msg));
+	}.bind(ext);
+
+	ext.panelFlash = function(panel, color, changeCount, onSecondsPerChange, offSecondsPerChange) {
+		console.log('panelPulse');
+		if (!connected) {
+			console.log('Not connected to toypad!');
+			return;
+		}
+		console.log(panel, color, secondsPerChange);
+		msg = {
+			command: 'panelFlash',
+			panel: panel,
+			color: color,
+			onSecondsPerChange: onSecondsPerChange,
+			offSecondsPerChange: offSecondsPerChange,
+			changeCount: changeCount
 		};
 		socket.send(JSON.stringify(msg));
 	}.bind(ext);
@@ -162,13 +180,23 @@
 			['h', 'When %m.minifig added to %m.panel', 'minifigAdded', 'STEVE', 'ALL'],
 			['h', 'When %m.minifig removed from %m.panel', 'minifigRemoved', 'STEVE', 'ALL'],
 			['w', 'Connect to the toypad.', 'cnct'],
-			[' ', 'Fade %m.panel color to %m.color in %n seconds', 'fadePanel', 'ALL', 'WHITE', 0],
-			[' ', 'Change %m.panel color to %m.color', 'changePanel', 'ALL', 'WHITE']
+			[' ', 'Change %m.panel color to %m.color', 'panelChange', 'ALL', 'WHITE'],
+			[' ', 'Fade %m.panel to %m.color in %n seconds', 'panelFade', 'ALL', 'WHITE', 1],
+			[' ', 'Pulse %m.panel to %m.color, changing colors %n times, %n seconds each pulse', 'panelPulse', 'ALL', 'BLUE', 6, 1],
+			[
+				' ',
+				'Flash %m.panel to %m.color, changing colors %n times, %n seconds for new color, %n for old color',
+				'panelFlash',
+				'ALL',
+				'BLUE',
+				6,
+				1,
+				2
+			]
 		],
 		menus: {
 			panel: panels,
 			color: ['OFF', 'RED', 'GREEN', 'BLUE', 'PURPLE', 'WHITE'],
-			speed: ['SLOW', 'MEDIUM', 'FAST'],
 			minifig: minifigs
 		}
 	};

@@ -46,8 +46,7 @@ wss.on('connection', function connection(ws) {
 	ws.on('message', function incoming(message) {
 		var data = JSON.parse(message);
 		switch (data.command) {
-			case 'fadePanel':
-				console.log('Received fadePanel from scratch');
+			case 'panelChange':
 				var panel = toypad.panels[data.panel] || null;
 				if (!panel) {
 					return;
@@ -56,8 +55,52 @@ wss.on('connection', function connection(ws) {
 				if (color === null) {
 					return;
 				}
-				var speed = data.speed;
-				toypad.fadePanel(panel, color, speed);
+				toypad.panelChange(panel, color);
+				break;
+
+			case 'panelFade':
+				var panel = toypad.panels[data.panel] || null;
+				if (!panel) {
+					return;
+				}
+				var color = toypad.colors[data.color] || null;
+				if (color === null) {
+					return;
+				}
+				if (typeof data.secondsPerChange === 'undefined') {
+					return;
+				}
+				if (typeof data.changeCount === 'undefined') {
+					return;
+				}
+				toypad.panelFade(panel, color, parseFload(data.secondsPerChange), parseInt(data.changeCount));
+				break;
+
+			case 'panelFlash':
+				var panel = toypad.panels[data.panel] || null;
+				if (!panel) {
+					return;
+				}
+				var color = toypad.colors[data.color] || null;
+				if (color === null) {
+					return;
+				}
+				if (typeof data.onSecondsPerChange === 'undefined') {
+					return;
+				}
+				if (typeof data.offSecondsPerChange === 'undefined') {
+					return;
+				}
+				if (typeof data.changeCount === 'undefined') {
+					return;
+				}
+				toypad.panelFlash(
+					panel,
+					color,
+					parseFloat(data.onSecondsPerChange),
+					parseFloat(data.offSecondsPerChange),
+					parseInt(data.changeCount)
+				);
 				break;
 
 			case 'shutdown':
