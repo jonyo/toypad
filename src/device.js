@@ -11,7 +11,8 @@ class Device extends EventEmitter {
 	constructor () {
 		super();
 		this.hid = null;
-		this.colorUpdateNumber = 0;
+		// Used for each command, it is sent with every command sent to the gamepad and is incremented for every one
+		this._commandIndex = 0;
 	}
 
 	get panels () {
@@ -68,14 +69,40 @@ class Device extends EventEmitter {
 	 */
 	panelChange (panel, color) {
 		var data = [
-			this.colorUpdateNumber & 0xFF,
+			this._commandIndex & 0xFF,
 			panel.code,
 			(color.code >> 16) & 0xFF,
 			(color.code >> 8) & 0xFF,
 			color.code & 0xFF
 		];
 		this._write([0x55, 0x06, 0xc0].concat(data));
-		this.colorUpdateNumber++;
+		this._commandIndex++;
+	}
+
+	/**
+	 * Change multiple panels at once.
+	 * @param {object|null} centerColor Center pad color, or null to indicate no change to this pad
+	 * @param {object|null} leftColor Left pad color, or null to indicate no change to this pad
+	 * @param {object|null} rightColor right pad color, or null to indicate no change to this pad
+	 */
+	panelsChange(centerColor, leftColor, rightColor) {
+		var addPadColor = function(color) {
+			if (color === null) {
+				return [0, 0, 0, 0];
+			}
+			return [
+				1,
+				(color.code >> 16) & 0xff,
+				(color.code >> 8) & 0xff,
+				color.code & 0xff
+			];
+		};
+		var data = [this._commandIndex & 0xff]
+			.concat(addPadColor(centerColor))
+			.concat(addPadColor(leftColor))
+			.concat(addPadColor(rightColor));
+		this._write([0x55, 0x0e, 0xc8].concat(data));
+		this._commandIndex++;
 	}
 
 	/**
@@ -93,7 +120,7 @@ class Device extends EventEmitter {
 	 */
 	panelFade (panel, color, secondsPerChange, changeCount) {
 		var data = [
-			this.colorUpdateNumber & 0xFF,
+			this._commandIndex & 0xFF,
 			panel.code,
 			(secondsPerChange * 16) & 0xff,
 			changeCount & 0xff,
@@ -102,7 +129,45 @@ class Device extends EventEmitter {
 			color.code & 0xFF
 		];
 		this._write([0x55, 0x08, 0xc2].concat(data));
-		this.colorUpdateNumber++;
+		this._commandIndex++;
+	}
+
+	/**
+	 * Fade multiple panels each with their own color and options.  See panelFade docs for more in-depth description
+	 * for each of the options.
+	 * @param {object|null} centerOptions Fade settings for center panel, null to not fade
+	 * @param {object} centerOptions.color Color to fade to
+	 * @param {number} centerOptions.secondsPerChange Number of seconts to take when fading to the new color.
+	 * @param {number} centerOptions.changeCount Number of times to change colors
+	 * @param {object|null} leftOptions Fade settings for left panel, null to not fade
+	 * @param {object} leftOptions.color Color to fade to
+	 * @param {number} leftOptions.secondsPerChange Number of seconts to take when fading to the new color.
+	 * @param {number} leftOptions.changeCount Number of times to change colors
+	 * @param {object|null} rightOptions Fade settings for right panel, null to not fade
+	 * @param {object} rightOptions.color Color to fade to
+	 * @param {number} rightOptions.secondsPerChange Number of seconts to take when fading to the new color.
+	 * @param {number} rightOptions.changeCount Number of times to change colors
+	 */
+	panelsFade (centerOptions, leftOptions, rightOptions) {
+		var addPadOptions = function(options) {
+			if (options === null) {
+				return [0, 0, 0, 0, 0, 0];
+			}
+			return [
+				1,
+				(options.secondsPerChange * 16) & 0xff,
+				options.changeCount & 0xff,
+				(options.color.code >> 16) & 0xff,
+				(options.color.code >> 8) & 0xff,
+				options.color.code & 0xff
+			];
+		}
+		var data = [this._commandIndex & 0xff]
+			.concat(addPadOptions(centerOptions))
+			.concat(addPadOptions(leftOptions))
+			.concat(addPadOptions(rightOptions));
+		this._write([0x55, 0x14, 0xc6].concat(data));
+		this._commandIndex++;
 	}
 
 	/**
@@ -119,7 +184,7 @@ class Device extends EventEmitter {
 	 */
 	panelFlash (panel, onColor, onSecondsPerChange, offSecondsPerChange, changeCount) {
 		var data = [
-			this.colorUpdateNumber & 0xFF,
+			this._commandIndex & 0xFF,
 			panel.code,
 			(onSecondsPerChange * 16) & 0xff,
 			(offSecondsPerChange * 16) & 0xff,
@@ -129,7 +194,49 @@ class Device extends EventEmitter {
 			onColor.code & 0xFF
 		];
 		this._write([0x55, 0x09, 0xc3].concat(data));
-		this.colorUpdateNumber++;
+		this._commandIndex++;
+	}
+
+	/**
+	 * Flash multiple panels each with their own color and options.  See panelFlash docs for more in-depth description
+	 * for each of the options.
+	 * @param {object|null} centerOptions Flash settings for center panel, null to not flash
+	 * @param {object} centerOptions.onColor Color to flash to
+	 * @param {number} centerOptions.onSecondsPerChange Number of seconds to show the onColor for each change.
+	 * @param {number} centerOptions.offSecondsPerChange Number or seconds to show the previous color (off color)
+	 * @param {number} centerOptions.changeCount Number of times to change colors
+	 * @param {object|null} leftOptions Flash settings for left panel, null to not flash
+	 * @param {object} leftOptions.onColor Color to flash to
+	 * @param {number} leftOptions.onSecondsPerChange Number of seconds to show the onColor for each change.
+	 * @param {number} leftOptions.offSecondsPerChange Number or seconds to show the previous color (off color)
+	 * @param {number} leftOptions.changeCount Number of times to change colors
+	 * @param {object|null} rightOptions Flash settings for right panel, null to not flash
+	 * @param {object} rightOptions.onColor Color to flash to
+	 * @param {number} rightOptions.onSecondsPerChange Number of seconds to show the onColor for each change.
+	 * @param {number} rightOptions.offSecondsPerChange Number or seconds to show the previous color (off color)
+	 * @param {number} rightOptions.changeCount Number of times to change colors
+	 */
+	panelsFlash (centerOptions, leftOptions, rightOptions) {
+		var addPadOptions = function(options) {
+			if (options === null) {
+				return [0, 0, 0, 0, 0, 0, 0];
+			}
+			return [
+				1,
+				(options.onSecondsPerChange * 16) & 0xff,
+				(options.offSecondsPerChange * 16) & 0xff,
+				options.changeCount & 0xff,
+				(options.onColor.code >> 16) & 0xff,
+				(options.onColor.code >> 8) & 0xff,
+				options.onColor.code & 0xff
+			];
+		}
+		var data = [this._commandIndex & 0xff]
+			.concat(addPadOptions(centerOptions))
+			.concat(addPadOptions(leftOptions))
+			.concat(addPadOptions(rightOptions));
+		this._write([0x55, 0x17, 0xc7].concat(data));
+		this._commandIndex++;
 	}
 
 	/**
