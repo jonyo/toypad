@@ -6,6 +6,11 @@ const Panel = require('./panel.js');
 const Color = require('./color.js');
 const VENDOR_ID = 0x0e6f;
 const PRODUCT_ID = 0x0241;
+const Debug = require('debug');
+const debug = Debug('toypad:device');
+const debugHid = Debug('toypad:HID');
+const debugHidRaw = Debug('toypad:HID-raw');
+const error = Debug('app:error');
 
 class Device extends EventEmitter {
 	constructor () {
@@ -35,8 +40,9 @@ class Device extends EventEmitter {
 	 * Connect to the toypad
 	 */
 	connect () {
+		debug('Connecting to toypad...');
 		if (this.hid) {
-			// already connected... disconnect and re-connect ??
+			debug('Connection was already established, closing existing connection and re-connecting...');
 			this.disconnect();
 		}
 		this.hid = new HID.HID(VENDOR_ID, PRODUCT_ID);
@@ -55,7 +61,9 @@ class Device extends EventEmitter {
 	 * Disconnect from the toypad
 	 */
 	disconnect () {
+		debug('Disconnecting from toypad...');
 		if (!this.hid) {
+			debug('No connection to close...');
 			return;
 		}
 		this.hid.close();
@@ -68,6 +76,7 @@ class Device extends EventEmitter {
 	 * @param {object} color
 	 */
 	panelChange (panel, color) {
+		debug('panelChange: Changing %s panel to %s color', panel.name, color.name);
 		var data = [
 			this._commandIndex & 0xFF,
 			panel.code,
@@ -86,6 +95,12 @@ class Device extends EventEmitter {
 	 * @param {object|null} rightColor right pad color, or null to indicate no change to this pad
 	 */
 	panelsChange(centerColor, leftColor, rightColor) {
+		debug(
+			'panelsChange: Center panel to %s, left panel to %s, right panel to %s',
+			centerColor.name || 'NO CHANGE',
+			leftColor.name || 'NO CHANGE',
+			rightColor.name || 'NO CHANGE'
+		);
 		var addPadColor = function(color) {
 			if (color === null) {
 				return [0, 0, 0, 0];
@@ -119,6 +134,13 @@ class Device extends EventEmitter {
 	 * If >= 200 it will continue to fade between colors forever until next color change for the pad is sent.
 	 */
 	panelFade (panel, color, secondsPerChange, changeCount) {
+		debug(
+			'panelFade: Fading %s panel to %s, with %d seconds per change and change count of %d',
+			panel.name,
+			color.name,
+			secondsPerChange,
+			changeCount
+		);
 		var data = [
 			this._commandIndex & 0xFF,
 			panel.code,
@@ -149,6 +171,7 @@ class Device extends EventEmitter {
 	 * @param {number} rightOptions.changeCount Number of times to change colors
 	 */
 	panelsFade (centerOptions, leftOptions, rightOptions) {
+		debug('panelsFade: fading multiple panels');
 		var addPadOptions = function(options) {
 			if (options === null) {
 				return [0, 0, 0, 0, 0, 0];
@@ -183,6 +206,14 @@ class Device extends EventEmitter {
 	 * If >= 199 it will continue to flash forever until next color change for the pad is sent.
 	 */
 	panelFlash (panel, onColor, onSecondsPerChange, offSecondsPerChange, changeCount) {
+		debug(
+			'Flashing %s panel to %s for %d seconds, then off for %d seconds, with total number of %d changes',
+			panel.name,
+			onColor.name,
+			onSecondsPerChange,
+			offSecondsPerChange,
+			changeCount
+		);
 		var data = [
 			this._commandIndex & 0xFF,
 			panel.code,
@@ -217,6 +248,7 @@ class Device extends EventEmitter {
 	 * @param {number} rightOptions.changeCount Number of times to change colors
 	 */
 	panelsFlash (centerOptions, leftOptions, rightOptions) {
+		debug('panelsFlash: Flashing multiple panels');
 		var addPadOptions = function(options) {
 			if (options === null) {
 				return [0, 0, 0, 0, 0, 0, 0];
@@ -240,37 +272,67 @@ class Device extends EventEmitter {
 	}
 
 	/**
+	 * Request to read memory from the tag.  This is async request so will need to request then listen for the response.
+	 * This is still a work in progress so the signature will probably change when we get it fully working.
+	 * @param {number} tagIndex Tag index
+	 * @param {[type]} pageNum  [description]
+	 * @private
+	 */
+	_readTag(tagIndex, pageNum) {
+		debug('readTag: Sending command to read the %d page for tag with index %d', pageNum, tagIndex);
+		debug('Note: This is still experimental, responses are not yet emitted (still figuring out how to parse)');
+		debug(
+			'Index used for request: %d (will need this when getting results. Probably. It is experimental, remember?)',
+			this._commandIndex
+		);
+		this._write([0x55, 0x04, 0xd2, this._commandIndex & 0xff, tagIndex & 0xff, pageNum & 0xff]);
+		this._commandIndex++;
+		// todo: return command index as it appears to be needed to tell what results go to what request...
+		// Maybe this should be done for all commands?
+	}
+
+	/**
 	 * Internal handler when data is emitted from HID.  Handles emitting an appropriate event depending on the data.
 	 * @param {string} data
 	 * @private
 	 */
 	_onHidData (data) {
-		console.log('got data');
+		debugHidRaw('read: %o', data);
 		var cmd = data[1];
 
 		if (cmd === 0x0b) {
 			// minifg scanned
-			console.log('minifig-scan');
-			console.log(this);
-			console.log(this.listenerCount('minifig-scan'));
+			debugHid('minifig-scan');
 			var uid = Minifig.Minifig.bufferToUid(data.slice(7, 13));
+			if (Minifig.uids[uid]) {
+				// set tag index for reference to allow reading later
+				Minifig.uids[uid].tagIndex = data[4];
+			}
 			this.emit(
 				'minifig-scan',
 				{
 					'panel': Panel.codes[data[2]] || null,
 					'action': Action.codes[data[5]] || null,
 					'minifig': Minifig.uids[uid] || null,
-					'uid': uid
+					'uid': uid,
+					'tagIndex': data[4]
 				}
 			);
 		} else if (cmd === 0x01) {
 			// LED change
-			console.log('led-change', data);
+			debugHid('led-change');
+		} else if (cmd === 0x02) {
+			debugHid('tag-read - possibly the tagIndex not found or no longer on toypad?');
+			debugHid('for command index: %d', data[2]);
+		} else if (cmd === 0x12) {
+			debugHid('tag-read');
+			debugHid('for command index: %d', data[2]);
 		} else if (cmd === 0x19) {
 			// connected
+			debugHid('connected');
 			this.emit('connected');
 		} else {
-			console.log('unknown toypad command', data);
+			debugHid('Unknown toypad command: %s', cmd);
 		}
 	}
 
@@ -280,6 +342,7 @@ class Device extends EventEmitter {
 	 * @private
 	 */
 	_onHidError (error) {
+		debugHid('error: %O', error);
 		this.emit('error', error);
 	}
 
@@ -290,9 +353,10 @@ class Device extends EventEmitter {
 	 */
 	_write (data) {
 		if (!this.hid) {
-			console.log('Cannot write, not connected to toypad.');
+			error('Cannot send, not connected to toypad.');
 			return;
 		}
+		debugHidRaw('write: %o', data);
 		this.hid.write(
 			[0x00].concat(
 				this._pad(
