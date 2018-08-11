@@ -1,4 +1,6 @@
-const names = {};
+/**
+ * @module toypad/color
+ */
 
 class Color {
 	/**
@@ -20,9 +22,11 @@ class Color {
 	 * Color.add(new Color('NAVY', 0x0000aa));
 	 */
 	static add (color) {
-		names[name] = color;
+		Color.names[color.name] = color;
 	}
 }
+
+Color.names = {};
 
 // Add the main colors
 Color.add(new Color('RED', 0xff0000));
@@ -31,5 +35,4 @@ Color.add(new Color('BLUE', 0x0000ff));
 Color.add(new Color('WHITE', 0xffffff));
 Color.add(new Color('OFF', 0x000000));
 
-exports.names = names;
-exports.Color = Color;
+module.exports = Color;
