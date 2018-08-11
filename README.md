@@ -154,6 +154,8 @@ Enable all messages from this library (VERY verbose):
 ```bash
 DEBUG=dimensions-toypad* node my-script.js
 ```
+# Versions
+This library adheres to [semver](https://semver.org/)
 
 # Reference
 
