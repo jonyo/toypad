@@ -5,23 +5,23 @@ This is a library that can be used to interact with the Lego Dimensions toypad. 
 # Installation
 You can install it in your own project:
 ```js
-npm install jonyo/toypad --save
+npm install @jonyo/toypad --save
 ```
 
 # Usage
 
 There are several example scripts that illustrate how to use the library.  You can find simple examples below.
 
-## Load the jonyo/toypad module
+## Load the @jonyo/toypad module
 
 ```js
-const Toypad = require('jonyo/toypad');
+const Toypad = require('@jonyo/toypad');
 ```
 
 ## Connect to the toypad
 
 ```js
-const Toypad = require('jonyo/toypad');
+const Toypad = require('@jonyo/toypad');
 
 var toypad = new Toypad();
 toypad.connect();
@@ -34,7 +34,7 @@ There are a few actions that are emitted, see below.
 ### connected
 Allow you to do something when the connection is established.
 ```js
-const Toypad = require('jonyo/toypad');
+const Toypad = require('@jonyo/toypad');
 
 var toypad = new Toypad();
 toypad.connect();
@@ -48,7 +48,7 @@ toypad.on('connected', function () {
 Happens when a minifig (or any NFC tag) is added or removed from the toypad.  Also when initially connecting to the toypad, if there are any figures already on the toypad it will trigger an add for each figure.
 
 ```js
-const Toypad = require('jonyo/toypad');
+const Toypad = require('@jonyo/toypad');
 
 var toypad = new Toypad();
 toypad.connect();

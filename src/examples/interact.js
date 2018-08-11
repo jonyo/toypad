@@ -2,7 +2,7 @@
  * This is an example of how to use the module, it sets up some interactivity with the toypad.
  */
 
-const Toypad = require('jonyo/toypad');
+const Toypad = require('@jonyo/toypad');
 
 // You would normally define your minifig UID's to enable interacting based on which minifig was added...  Also the
 // minifig counts require the minifig added to be defined.

@@ -1,5 +1,5 @@
 {
-  "name": "jonyo/toypad",
+  "name": "@jonyo/toypad",
   "version": "1.0.0",
   "description": "Lego Dimensions Toy Pad custom library (with custom nfc tags defined) for NodeJS",
   "main": "src/toypad.js",
