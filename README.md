@@ -136,6 +136,25 @@ In addition to the minifigures that come with the Lego Dimensions game, it can a
 
 You would just need to find out the UID (see the Minifigure UID section above) and you can start using anything that uses NFC tags.
 
+# Debug
+This project uses the debug library for debug messages.  If you are not familiar, it allows turning on debug messages from specific sources depending on `DEBUG` environment variable.  All the debug messages in this library use `dimensions-toypad` prefix.
+
+Enable just the main top-level messages
+```bash
+DEBUG=dimensions-toypad node my-script.js
+```
+
+Enable only "device" messages:
+```bash
+DEBUG=dimensions-toypad:device node my-script.js
+```
+There are other levels as well, you can see them all with a wildcard:
+
+Enable all messages from this library (VERY verbose):
+```bash
+DEBUG=dimensions-toypad* node my-script.js
+```
+
 # Reference
 
 In this library I stand on the shoulders of others, adding to work that was previously done.  Below are the references I used when making this library.

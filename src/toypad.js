@@ -7,7 +7,7 @@ const Device = require('./device');
 const Minifig = require('./minifig');
 const Panel = require('./panel');
 const Action = require('./action');
-const debug = require('debug')('toypad');
+const debug = require('debug')('dimensions-toypad');
 
 class Toypad extends EventEmitter {
 	constructor () {

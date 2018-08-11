@@ -7,9 +7,9 @@ const HID = require('node-hid');
 const VENDOR_ID = 0x0e6f;
 const PRODUCT_ID = 0x0241;
 const Debug = require('debug');
-const debug = Debug('toypad:device');
-const debugHid = Debug('toypad:HID');
-const debugHidRaw = Debug('toypad:HID-raw');
+const debug = Debug('dimensions-toypad:device');
+const debugHid = Debug('dimensions-toypad:HID');
+const debugHidRaw = Debug('dimensions-toypad:HID-raw');
 const error = Debug('app:error');
 
 /**
@@ -103,7 +103,7 @@ class Device extends EventEmitter {
 		debug('Note: This is still experimental, responses are not yet emitted (still figuring out how to parse)');
 		debug(
 			'Index used for request: %d (will need this when getting results. Probably. It is experimental, remember?)',
-			this._commandIndex
+			this._index
 		);
 		this._write([0x55, 0x04, 0xd2, this._commandIndex(), tagIndex & 0xff, pageNum & 0xff]);
 		this._commandIndex++;

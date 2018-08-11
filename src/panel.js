@@ -23,6 +23,7 @@ class Panel {
 		this.name = name;
 		this.code = code;
 		this.minifigs = {};
+		// TODO: keep track of the color?
 		this.color = Color.OFF;
 	}
 

@@ -1,7 +1,7 @@
 /**
  * @module toypad/minifig
  */
-const debug = require('debug')('toypad:minifig');
+const debug = require('debug')('dimensions-toypad:minifig');
 
 /**
  * Minifig class, defines in individual minifig and keeps track of all defined minifigs.
