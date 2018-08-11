@@ -1,6 +1,6 @@
 # dimensions-toypad
 
-This is a library that can be used to interact with the Lego Dimensions toypad.  This project is an indipendent project meant to let you interact with the toypad outside of the game itself.
+This is a library that can be used to interact with the Lego Dimensions toypad.  This project is an independent project meant to let you interact with the toypad outside of the game itself.
 
 # Installation
 You can install it in your own project:
@@ -27,9 +27,9 @@ var toypad = new Toypad();
 toypad.connect();
 ```
 
-## Actions emmitted
+## Actions emitted
 
-There are a few actions that are emmitted, see below.
+There are a few actions that are emitted, see below.
 
 ### connected
 Allow you to do something when the connection is established.
@@ -112,10 +112,10 @@ toypad.panelFlash(Toypad.panels.RIGHT, Toypad.colors.RED, .5, .1, 1);
 
 ### Changing multiple panels at once
 
-Each of the different ways has a plural version, like `panelChange` has `panelsChange`.  Each one takes 3 arguments, which are the options for the center panel, left panel, and right panel respectively.  See the jsdocs on each of the methods for the full info, it allows for more complex things.
+Each of the different ways has a plural version, like `panelChange` has `panelsChange`.  Each one takes 3 arguments, which are the options for the center panel, left panel, and right panel respectively.  See the jsdocs on each of the methods for the full info.
 
 ### Using 0 for any "second" options
-It is best to avoid using 0 for any of the timings on any of the fade or flash methods, if you want to immediatly switch to a new color use `panelChange` to avoid odd behavior.  In particular, when you fade with 0 seconds, it can switch to the new color but the next transition(s) you do it will act like it is still on the old color.  We've also seen other really odd behavior that only seems to happen when using a fade or flash with 0 seconds so it is best to avoid that.
+It is best to avoid using 0 for any of the timings on any of the fade or flash methods, if you want to immediately switch to a new color use `panelChange` to avoid odd behavior.  In particular, when you fade with 0 seconds, it can switch to the new color but the next transition(s) you do it will act like it is still on the old color.  We've also seen other really odd behavior that only seems to happen when using a fade or flash with 0 seconds so it is best to avoid that.
 
 ### Use panelChange to ensure "previous" color is what you expect
 If you start a new color change before the old one is done, sometimes it can be kind of weird.  To avoid weird behavior especially when using an even number of changes (so you want it to end on the previous color), use `panelChange` to ensure it ends on the previous color you are expecting.
