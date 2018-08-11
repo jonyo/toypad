@@ -1,5 +1,5 @@
 {
-  "name": "dimensions-toypad",
+  "name": "jonyo/toypad",
   "version": "1.0.0",
   "description": "Lego Dimensions Toy Pad custom library (with custom nfc tags defined) for NodeJS",
   "main": "src/toypad.js",
@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jonyo/dimensions-toypad.git"
+    "url": "git+https://github.com/jonyo/toypad.git"
   },
   "dependencies": {
     "debug": "^3.1.0",

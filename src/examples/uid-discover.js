@@ -6,7 +6,7 @@
  * interaction is not (yet) possible with this library.
  */
 
-const Toypad = require('dimensions-toypad');
+const Toypad = require('jonyo/toypad');
 
 var toypad = new Toypad();
 toypad.connect();

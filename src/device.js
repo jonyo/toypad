@@ -7,9 +7,9 @@ const HID = require('node-hid');
 const VENDOR_ID = 0x0e6f;
 const PRODUCT_ID = 0x0241;
 const Debug = require('debug');
-const debug = Debug('dimensions-toypad:device');
-const debugHid = Debug('dimensions-toypad:HID');
-const debugHidRaw = Debug('dimensions-toypad:HID-raw');
+const debug = Debug('toypad:device');
+const debugHid = Debug('toypad:HID');
+const debugHidRaw = Debug('toypad:HID-raw');
 const error = Debug('app:error');
 
 /**

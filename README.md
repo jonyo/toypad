@@ -1,27 +1,27 @@
-# dimensions-toypad
+# toypad
 
 This is a library that can be used to interact with the Lego Dimensions toypad.  This project is an independent project meant to let you interact with the toypad outside of the game itself.
 
 # Installation
 You can install it in your own project:
 ```js
-npm install dimensions-toypad --save
+npm install jonyo/toypad --save
 ```
 
 # Usage
 
 There are several example scripts that illustrate how to use the library.  You can find simple examples below.
 
-## Load the dimensions-toypad module
+## Load the jonyo/toypad module
 
 ```js
-const Toypad = require('dimensions-toypad');
+const Toypad = require('jonyo/toypad');
 ```
 
 ## Connect to the toypad
 
 ```js
-const Toypad = require('dimensions-toypad');
+const Toypad = require('jonyo/toypad');
 
 var toypad = new Toypad();
 toypad.connect();
@@ -34,7 +34,7 @@ There are a few actions that are emitted, see below.
 ### connected
 Allow you to do something when the connection is established.
 ```js
-const Toypad = require('dimensions-toypad');
+const Toypad = require('jonyo/toypad');
 
 var toypad = new Toypad();
 toypad.connect();
@@ -48,7 +48,7 @@ toypad.on('connected', function () {
 Happens when a minifig (or any NFC tag) is added or removed from the toypad.  Also when initially connecting to the toypad, if there are any figures already on the toypad it will trigger an add for each figure.
 
 ```js
-const Toypad = require('dimensions-toypad');
+const Toypad = require('jonyo/toypad');
 
 var toypad = new Toypad();
 toypad.connect();
@@ -137,22 +137,22 @@ In addition to the minifigures that come with the Lego Dimensions game, it can a
 You would just need to find out the UID (see the Minifigure UID section above) and you can start using anything that uses NFC tags.
 
 # Debug
-This project uses the debug library for debug messages.  If you are not familiar, it allows turning on debug messages from specific sources depending on `DEBUG` environment variable.  All the debug messages in this library use `dimensions-toypad` prefix.
+This project uses the debug library for debug messages.  If you are not familiar, it allows turning on debug messages from specific sources depending on `DEBUG` environment variable.  All the debug messages in this library use `toypad` prefix.
 
 Enable just the main top-level messages
 ```bash
-DEBUG=dimensions-toypad node my-script.js
+DEBUG=toypad node my-script.js
 ```
 
 Enable only "device" messages:
 ```bash
-DEBUG=dimensions-toypad:device node my-script.js
+DEBUG=toypad:device node my-script.js
 ```
 There are other levels as well, you can see them all with a wildcard:
 
 Enable all messages from this library (VERY verbose):
 ```bash
-DEBUG=dimensions-toypad* node my-script.js
+DEBUG=toypad* node my-script.js
 ```
 # Versions
 This library adheres to [semver](https://semver.org/)
